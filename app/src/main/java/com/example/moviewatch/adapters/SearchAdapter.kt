@@ -5,12 +5,22 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.moviewatch.R
 import com.example.moviewatch.data.InnerResults
 import com.example.moviewatch.data.Results
 import com.example.moviewatch.databinding.ListItemSearchBinding
+import java.util.*
 
-class SearchAdapter(var searchMovieList: List<InnerResults>) :
+class SearchAdapter(
+    var searchMovieList: List<InnerResults>,
+    val callBack: IFavoriteMovie
+) :
     RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
+
+
+    interface IFavoriteMovie {
+        fun onFavoriteMovie(movie: InnerResults)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchViewHolder {
         return SearchViewHolder(
@@ -23,7 +33,7 @@ class SearchAdapter(var searchMovieList: List<InnerResults>) :
     }
 
     override fun onBindViewHolder(holder: SearchViewHolder, position: Int) {
-        holder.bind(searchMovieList[position])
+        holder.bind(searchMovieList[position], callBack)
     }
 
     fun submitList(results: Results) {
@@ -38,12 +48,23 @@ class SearchAdapter(var searchMovieList: List<InnerResults>) :
 
     inner class SearchViewHolder(val binding: ListItemSearchBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: InnerResults) {
+        fun bind(item: InnerResults, callBack: IFavoriteMovie) {
             binding.searchTitle.text = item.title
             binding.rating.text = item.voteAverage.toString()
             Glide.with(this.itemView)
                 .load("https://image.tmdb.org/t/p/w200/" + item.posterPath)
                 .into(binding.searchPoster)
+
+            if (item.isFavorite) {
+                binding.favButton.setBackgroundResource(R.drawable.ic_baseline_check_circle_outline_24)
+            }
+
+            binding.favButton.setOnClickListener {
+                if (!item.isFavorite) {
+                    item.isFavorite = true
+                    callBack.onFavoriteMovie(item)
+                }
+            }
 
         }
     }

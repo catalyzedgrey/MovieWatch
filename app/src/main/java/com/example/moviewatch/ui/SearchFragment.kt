@@ -5,15 +5,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
 import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.moviewatch.HomeViewModel
 import com.example.moviewatch.adapters.SearchAdapter
 import com.example.moviewatch.data.InnerResults
+import com.example.moviewatch.data.MovieDao
 import com.example.moviewatch.databinding.FragmentSearchBinding
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-class SearchFragment : Fragment() {
+@AndroidEntryPoint
+class SearchFragment : Fragment(), SearchAdapter.IFavoriteMovie {
 
     private lateinit var viewModel: HomeViewModel
     private var _binding: FragmentSearchBinding? = null
@@ -23,7 +28,10 @@ class SearchFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var searchMoviesList: ArrayList<InnerResults> = ArrayList()
-    private val adapter: SearchAdapter = SearchAdapter(searchMoviesList)
+    private val adapter: SearchAdapter = SearchAdapter(searchMoviesList, this)
+
+    @Inject
+    lateinit var movieDao: MovieDao
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,7 +48,6 @@ class SearchFragment : Fragment() {
 
 
         val searchView: SearchView = binding.searchView
-
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
             androidx.appcompat.widget.SearchView.OnQueryTextListener {
@@ -68,5 +75,9 @@ class SearchFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onFavoriteMovie(movie: InnerResults) {
+        viewModel.favoriteMovie(movie, movieDao)
     }
 }
