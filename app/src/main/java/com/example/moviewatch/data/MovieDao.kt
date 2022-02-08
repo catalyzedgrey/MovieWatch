@@ -10,6 +10,9 @@ interface MovieDao {
     @Query("SELECT * FROM movies_table")
     suspend fun getAllMovies():List<InnerResults>
 
+    @Query("SELECT * FROM movies_table WHERE id Like :movieId")
+    fun findMovieById(movieId: String): InnerResults
+
     @Update
     suspend fun updateMovie(innerResults: InnerResults)
 

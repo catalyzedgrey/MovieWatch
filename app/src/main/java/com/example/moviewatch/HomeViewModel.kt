@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moviewatch.data.*
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -13,10 +14,12 @@ import kotlinx.coroutines.withContext
 import java.lang.Exception
 import javax.inject.Inject
 
-class HomeViewModel constructor() : ViewModel() {
+@HiltViewModel
+class HomeViewModel @Inject constructor() : ViewModel() {
 
     var trendingMovies: MutableLiveData<Results> = Repository.trendingMovies
     var searchResults: MutableLiveData<Results> = Repository.searchResults
+    @Inject lateinit var movieDao: MovieDao
 
     init {
         CoroutineScope(Dispatchers.IO).launch{
@@ -27,15 +30,14 @@ class HomeViewModel constructor() : ViewModel() {
 
     fun onQueryTextSubmit(query: String){
         CoroutineScope(Dispatchers.IO).launch {
-            Repository.searchMovies(query)
+            Repository.searchMovies(query, movieDao)
         }
 
     }
 
-    fun favoriteMovie(movie: InnerResults, movieDao: MovieDao) {
-        CoroutineScope(Dispatchers.IO).launch {
-            //Repository.favoriteMovie(movie)
-            movieDao.insertMovie(movie)
+    fun favoriteMovie(movie: InnerResults) {
+        viewModelScope.launch {
+            Repository.addToFavorites(movie, movieDao)
         }
 
     }

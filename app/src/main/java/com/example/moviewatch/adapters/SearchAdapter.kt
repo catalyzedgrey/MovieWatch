@@ -19,7 +19,7 @@ class SearchAdapter(
 
 
     interface IFavoriteMovie {
-        fun onFavoriteMovie(movie: InnerResults)
+        fun onFavoriteMovie(movie: InnerResults, position: Int)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchViewHolder {
@@ -34,6 +34,12 @@ class SearchAdapter(
 
     override fun onBindViewHolder(holder: SearchViewHolder, position: Int) {
         holder.bind(searchMovieList[position], callBack)
+        holder.binding.favButton.setOnClickListener {
+            if (!searchMovieList[position].isFavorite) {
+                searchMovieList[position].isFavorite = true
+                callBack.onFavoriteMovie(searchMovieList[position], position)
+            }
+        }
     }
 
     fun submitList(results: Results) {
@@ -56,15 +62,9 @@ class SearchAdapter(
                 .into(binding.searchPoster)
 
             if (item.isFavorite) {
-                binding.favButton.setBackgroundResource(R.drawable.ic_baseline_check_circle_outline_24)
+                binding.favButton.setImageResource(R.drawable.ic_baseline_check_circle_outline_24)
             }
 
-            binding.favButton.setOnClickListener {
-                if (!item.isFavorite) {
-                    item.isFavorite = true
-                    callBack.onFavoriteMovie(item)
-                }
-            }
 
         }
     }

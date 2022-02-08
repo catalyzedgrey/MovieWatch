@@ -7,9 +7,11 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.SearchView
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.moviewatch.HomeViewModel
+import com.example.moviewatch.R
 import com.example.moviewatch.adapters.SearchAdapter
 import com.example.moviewatch.data.InnerResults
 import com.example.moviewatch.data.MovieDao
@@ -77,7 +79,7 @@ class SearchFragment : Fragment(), SearchAdapter.IFavoriteMovie {
         _binding = null
     }
 
-    override fun onFavoriteMovie(movie: InnerResults) {
-        viewModel.favoriteMovie(movie, movieDao)
+    override fun onFavoriteMovie(movie: InnerResults, position: Int) {
+        viewModel.favoriteMovie(movie)
     }
 }
